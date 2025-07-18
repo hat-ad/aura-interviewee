@@ -1,0 +1,216 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+@layer base {
+  :root {
+    /* AI Interviewer Dark Theme */
+    --background: hsl(222, 84%, 4.9%);
+    --foreground: hsl(210, 40%, 98%);
+
+    --card: hsl(222, 84%, 6%);
+    --card-foreground: hsl(210, 40%, 98%);
+
+    --popover: hsl(222, 84%, 6%);
+    --popover-foreground: hsl(210, 40%, 98%);
+
+    --primary: hsl(217, 91%, 60%);
+    --primary-foreground: hsl(222, 84%, 4.9%);
+
+    --secondary: hsl(222, 47%, 11%);
+    --secondary-foreground: hsl(210, 40%, 98%);
+
+    --muted: hsl(222, 47%, 11%);
+    --muted-foreground: hsl(215, 20%, 65%);
+
+    --accent: hsl(217, 91%, 60%);
+    --accent-foreground: hsl(222, 84%, 4.9%);
+
+    --destructive: hsl(0, 84%, 60%);
+    --destructive-foreground: hsl(210, 40%, 98%);
+
+    --border: hsl(217, 32%, 17%);
+    --input: hsl(217, 32%, 17%);
+    --ring: hsl(217, 91%, 60%);
+
+    --radius: 0.75rem;
+
+    /* Custom AI Theme Variables */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(217, 91%, 60%),
+      hsl(224, 76%, 48%)
+    );
+    --gradient-dark: linear-gradient(
+      180deg,
+      hsl(222, 84%, 8%),
+      hsl(222, 84%, 2%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(222, 84%, 6%),
+      hsl(222, 47%, 8%)
+    );
+
+    --shadow-glow: 0 0 40px hsl(217, 91%, 60%, 0.3);
+    --shadow-card: 0 10px 30px -10px hsl(222, 84%, 4.9%, 0.8);
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Recording states */
+    --recording: hsl(0, 84%, 60%);
+    --recording-pulse: hsl(0, 84%, 60%, 0.4);
+    --success: hsl(142, 76%, 36%);
+    --warning: hsl(38, 92%, 50%);
+
+    --sidebar-background: hsl(0, 0%, 98%);
+    --sidebar-foreground: hsl(240, 5.3%, 26.1%);
+    --sidebar-primary: hsl(240, 5.9%, 10%);
+    --sidebar-primary-foreground: hsl(0, 0%, 98%);
+    --sidebar-accent: hsl(240, 4.8%, 95.9%);
+    --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
+    --sidebar-border: hsl(220, 13%, 91%);
+    --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+  }
+
+  .dark {
+    --background: linear-gradient(180deg, hsl(222, 84%, 8%), hsl(222, 84%, 2%));
+    --foreground: hsl(210, 40%, 98%);
+
+    --card: hsl(222.2, 84%, 4.9%);
+    --card-foreground: hsl(210, 40%, 98%);
+
+    --popover: hsl(222.2, 84%, 4.9%);
+    --popover-foreground: hsl(210, 40%, 98%);
+
+    --primary: hsl(210, 40%, 98%);
+    --primary-foreground: hsl(222.2, 47.4%, 11.2%);
+
+    --secondary: hsl(217.2, 32.6%, 17.5%);
+    --secondary-foreground: hsl(210, 40%, 98%);
+
+    --muted: hsl(217.2, 32.6%, 17.5%);
+    --muted-foreground: hsl(215, 20.2%, 65.1%);
+
+    --accent: hsl(217.2, 32.6%, 17.5%);
+    --accent-foreground: hsl(210, 40%, 98%);
+
+    --destructive: hsl(0, 62.8%, 30.6%);
+    --destructive-foreground: hsl(210, 40%, 98%);
+
+    --border: hsl(217.2, 32.6%, 17.5%);
+    --input: hsl(217.2, 32.6%, 17.5%);
+    --ring: hsl(212.7, 26.8%, 83.9%);
+    --sidebar-background: hsl(240, 5.9%, 10%);
+    --sidebar-foreground: hsl(240, 4.8%, 95.9%);
+    --sidebar-primary: hsl(224.3, 76.3%, 48%);
+    --sidebar-primary-foreground: hsl(0, 0%, 100%);
+    --sidebar-accent: hsl(240, 3.7%, 15.9%);
+    --sidebar-accent-foreground: hsl(240, 4.8%, 95.9%);
+    --sidebar-border: hsl(240, 3.7%, 15.9%);
+    --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    background: var(--gradient-dark);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .ai-card {
+    background-color: var(--color-card);
+    border: 1px solid rgba(var(--color-border), 0.5);
+    backdrop-filter: blur(4px);
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .ai-button-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    background: var(--gradient-primary);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-glow);
+    cursor: pointer;
+  }
+  .ai-button-primary:hover {
+    box-shadow: var(--shadow-glow), 0 8px 25px -8px hsl(217, 91%, 60%, 0.4) !important;
+  }
+
+  .recording-pulse {
+    animation: pulse-recording 2s infinite;
+  }
+
+  .glass-morphism {
+    backdrop-filter: blur(12px);
+    background-color: rgba(var(--card), 0.8);
+    border: 1px solid rgba(var(--border), 0.3);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes pulse-recording {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
