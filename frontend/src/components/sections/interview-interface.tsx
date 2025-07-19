@@ -1,10 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import useWebSocket from "@/hooks/useWebsocket";
 import { cn } from "@/lib/utils";
 import type { InterviewConfig } from "@/types/common";
 import { Brain, MessageCircle, Mic, Settings, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface InterviewInterfaceProps {
   config: InterviewConfig;
@@ -23,11 +25,22 @@ export const InterviewInterface = ({
   onBack,
 }: InterviewInterfaceProps) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const [currentTranscription, setCurrentTranscription] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const transcriptionRef = useRef<HTMLDivElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+
+  const { isConnected, lastMessage, error, sendMessage, closeConnection } =
+    useWebSocket("ws://localhost:8080", { reconnect: true });
+
+  useEffect(() => {
+    if (lastMessage) {
+      console.log("📨 Server response:", lastMessage);
+    }
+  }, [lastMessage]);
 
   // Simulate initial interviewer greeting
   useEffect(() => {
@@ -60,68 +73,78 @@ export const InterviewInterface = ({
 
   const handleStartRecording = async () => {
     try {
-      // Request microphone access
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      setIsRecording(true);
-      setIsConnected(true);
+      toast.success("Recording started!");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioContext = new AudioContext({ sampleRate: 16000 }); // Azure prefers 16kHz
+      const source = audioContext.createMediaStreamSource(stream);
+      const processor = audioContext.createScriptProcessor(4096, 1, 1); // mono
 
-      // Here you would initialize WebSocket connection
-      // For demo purposes, we'll simulate transcription
-      simulateTranscription();
+      audioContextRef.current = audioContext;
+      processorRef.current = processor;
+      sourceRef.current = source;
+
+      setIsRecording(true);
+
+      // Tell backend recording has started
+      sendMessage({
+        event: "TRANSCRIPTION",
+        subevent: "transcription:stream:init",
+        payload: { language: "en-US" },
+      });
+
+      processor.onaudioprocess = (e) => {
+        const input = e.inputBuffer.getChannelData(0); // mono channel
+        const pcmBuffer = new ArrayBuffer(input.length * 2); // 16-bit PCM = 2 bytes per sample
+        const view = new DataView(pcmBuffer);
+
+        for (let i = 0; i < input.length; i++) {
+          let sample = input[i];
+          sample = Math.max(-1, Math.min(1, sample)); // clamp
+          view.setInt16(i * 2, sample * 0x7fff, true); // little-endian
+        }
+
+        const uint8 = new Uint8Array(pcmBuffer);
+
+        // Stream PCM binary data through WebSocket
+        sendMessage({
+          event: "TRANSCRIPTION",
+          subevent: "transcription:stream:binary",
+          payload: uint8,
+        });
+      };
+
+      source.connect(processor);
+      processor.connect(audioContext.destination); // Optional: connect to speakers
     } catch (error) {
-      console.error("Failed to access microphone:", error);
+      toast.error("Failed to access microphone!");
+      console.error("Microphone access error:", error);
+      setIsRecording(false);
+      closeConnection();
     }
   };
 
   const handleStopRecording = () => {
-    setIsRecording(false);
-    if (currentTranscription.trim()) {
-      // Add user message
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        type: "user",
-        content: currentTranscription,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, userMessage]);
-      setCurrentTranscription("");
-
-      // Simulate processing and AI response
-      setIsProcessing(true);
-      setTimeout(() => {
-        const aiResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          type: "interviewer",
-          content:
-            "Thank you for that response. That's a good overview of your background. Now let me ask you a more technical question: Can you explain the difference between props and state in React, and when you would use each?",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, aiResponse]);
-        setIsProcessing(false);
-      }, 2000);
+    if (processorRef.current) {
+      processorRef.current.disconnect();
+      processorRef.current.onaudioprocess = null;
     }
+
+    if (sourceRef.current) {
+      sourceRef.current.disconnect();
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+    }
+
+    setIsRecording(false);
+
+    sendMessage({
+      event: "TRANSCRIPTION",
+      subevent: "transcription:stream:close",
+      payload: {},
+    });
   };
-
-  // Simulate real-time transcription
-  const simulateTransription = () => {
-    const sampleText =
-      "I have been working as a software developer for about 3 years now, primarily focusing on frontend development with React and TypeScript. I've worked on several projects including e-commerce platforms and dashboard applications.";
-    const words = sampleText.split(" ");
-    let currentIndex = 0;
-
-    const interval = setInterval(() => {
-      if (currentIndex < words.length && isRecording) {
-        setCurrentTranscription(
-          (prev) => prev + (prev ? " " : "") + words[currentIndex]
-        );
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 300);
-  };
-
-  const simulateTranscription = simulateTransription;
 
   return (
     <div className="min-h-screen bg-background p-4">

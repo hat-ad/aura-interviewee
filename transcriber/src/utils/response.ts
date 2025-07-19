@@ -1,3 +1,4 @@
+import { MessagePackHelper } from "@/serializer";
 import { WebSocketResponse } from "@/types/handler";
 import WebSocket, { Server } from "ws";
 export class WebSocketResponseManager {
@@ -11,7 +12,7 @@ export class WebSocketResponseManager {
       status: "success",
       data: payload,
     };
-    ws.send(JSON.stringify(response));
+    ws.send(MessagePackHelper.encode(type, response));
   }
 
   public static sendError(ws: WebSocket, type: string, error: string): void {
@@ -20,7 +21,7 @@ export class WebSocketResponseManager {
       status: "error",
       message: error,
     };
-    ws.send(JSON.stringify(response));
+    ws.send(MessagePackHelper.encode(type, response));
   }
 
   public static broadcast(wss: Server, type: string, payload: unknown): void {

@@ -1,7 +1,7 @@
+import { Toaster } from "@/components/ui/sonner";
 import { useEffect } from "react";
 import "./App.css";
 import Main from "./pages";
-
 function App() {
   useEffect(() => {
     const root = window.document.documentElement;
@@ -11,6 +11,7 @@ function App() {
   }, []);
   return (
     <>
+      <Toaster />
       <Main />
     </>
   );

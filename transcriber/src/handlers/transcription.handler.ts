@@ -51,20 +51,20 @@ class TranscriptionHandler {
           );
         },
         onError: (err) => {
+          clientContext.logger.error("Transcription error: " + err);
           WebSocketResponseManager.sendError(
             this.ws,
             "transcription:stream:error",
             err
           );
-          clientContext.logger.error("Transcription error: " + err);
         },
         onCancel: () => {
+          clientContext.logger.info("Transcription canceled");
           WebSocketResponseManager.sendSuccess(
             this.ws,
             "transcription:stream:cancelled",
             {}
           );
-          clientContext.logger.info("Transcription canceled");
         },
       }
     );
@@ -146,6 +146,16 @@ export function transcriptionHandler(
       break;
 
     case "transcription:stream:binary":
+      if (body.payload instanceof Uint8Array) {
+        body.payload = Buffer.from(body.payload);
+      } else {
+        WebSocketResponseManager.sendError(
+          ws,
+          body.event,
+          "Payload is not a uint8array"
+        );
+        break;
+      }
       if (!Buffer.isBuffer(body.payload)) {
         WebSocketResponseManager.sendError(
           ws,

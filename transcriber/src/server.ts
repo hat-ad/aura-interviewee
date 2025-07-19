@@ -2,7 +2,6 @@ import { randomUUID } from "crypto";
 import http, { IncomingMessage } from "http";
 import WebSocket, { WebSocketServer as WSS } from "ws";
 import registerHandler from "./handlers/handler";
-import { AuthService } from "./lib/auth.service";
 import config from "./lib/config.service";
 import logger, { createLoggerWithCorrelation } from "./lib/logger.service";
 import { ClientContext } from "./types/client";
@@ -22,17 +21,7 @@ export class SocketServer {
   private setup() {
     this.server.on("upgrade", async (request, socket, head) => {
       try {
-        const token = AuthService.extractToken(request);
-        if (!token) {
-          throw new Error("token: missing");
-        }
-
-        const userID = await AuthService.validateToken(token);
-        if (!userID) {
-          throw new Error("token: invalid");
-        }
-
-        const sessionID = "sessionID:" + randomUUID() + userID;
+        const sessionID = "sessionID:" + randomUUID();
         this.wss.handleUpgrade(request, socket, head, (ws) => {
           const ip = request.socket.remoteAddress;
           if (!ip) {
