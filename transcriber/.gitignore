@@ -1,5 +1,4 @@
 node_modules
-src/config/openai-endpoints.json
 .env.development
 .env.production
 .env

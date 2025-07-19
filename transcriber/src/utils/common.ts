@@ -1,6 +1,8 @@
 import axios, { AxiosError } from "axios";
+import { ZodError } from "zod";
 
-export function getError(error: unknown): any {
+export function getError(error: unknown) {
+  if (error instanceof ZodError) return "invalid request";
   if (axios.isAxiosError(error)) {
     const err = error as AxiosError;
     const errData = err.response?.data as Record<string, string>;
@@ -9,9 +11,6 @@ export function getError(error: unknown): any {
   const err = error as Error;
   if (err?.message) return err.message;
   else {
-    return JSON.stringify(error);
+    return String(error);
   }
 }
-
-export const getUniqueID = () =>
-  Date.now().toString(36) + Math.random().toString(36);

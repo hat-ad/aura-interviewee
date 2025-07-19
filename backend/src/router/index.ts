@@ -1,7 +1,7 @@
 import express from "express";
-import transcriptionRouter from "./transcription.router";
+import interviewRouter from "./interview.router";
 const router = express.Router();
 
-router.use("/transcription", transcriptionRouter);
+router.use("/interview", interviewRouter);
 
 export default router;

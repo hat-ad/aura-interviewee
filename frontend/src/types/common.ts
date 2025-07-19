@@ -10,3 +10,9 @@ export interface InterviewConfig {
   seniorityLevel: string;
   mode: "jd" | "skill";
 }
+
+export interface ServiceResponse<T> {
+  status: boolean;
+  data: T;
+  message: string;
+}

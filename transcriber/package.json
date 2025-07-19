@@ -1,0 +1,39 @@
+{
+  "name": "realtime-transcription-engine",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "npm run build && node -r module-alias/register dist/server.js",
+    "dev": "tsx watch --inspect src/server.ts"
+  },
+  "_moduleAliases": {
+    "@": "dist"
+  },
+  "engines": {
+    "npm": ">=8.19.4",
+    "node": ">=20.10.0 <=20.13.1"
+  },
+  "keywords": [],
+  "author": "hat-ad",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.44.1",
+    "module-alias": "^2.2.3",
+    "msgpack-lite": "^0.1.26",
+    "tsx": "^4.20.1",
+    "typescript": "^5.8.3",
+    "winston": "^3.17.0",
+    "ws": "^8.18.2",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/msgpack-lite": "^0.1.11",
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.18.1"
+  }
+}
