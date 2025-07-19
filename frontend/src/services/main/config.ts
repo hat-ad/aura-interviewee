@@ -6,7 +6,7 @@ const IP = {
   WEBSOCKET_LOCAL: "http://localhost:8080/",
 };
 
-export const BASE_URL = IP.DEV;
+export const BASE_URL = IP.LOCAL;
 
 const instance = axios.create({
   baseURL: `${BASE_URL}`,

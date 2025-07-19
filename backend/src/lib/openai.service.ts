@@ -74,6 +74,11 @@ export class OpenAIService {
       response.data.choices[0].message &&
       typeof response.data.choices[0].message.content === "string"
     ) {
+      console.log(
+        "🚀 ~ OpenAIService ~ getMessageContent ~ response.data:",
+        response.data.choices[0].message
+      );
+
       return response.data.choices[0].message.content;
     }
     // Return undefined or default fallback if content not found

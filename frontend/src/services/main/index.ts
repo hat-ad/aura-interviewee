@@ -16,8 +16,8 @@ export const getService = async (
       signal,
     });
     return {
-      status: response?.data?.success,
-      data: response?.data?.data,
+      status: response?.data?.code,
+      data: response?.data?.result,
       message: response?.data?.message,
     };
   } catch (e) {
@@ -53,8 +53,8 @@ export const postService = async (
     });
 
     return {
-      status: response?.data?.success,
-      data: response?.data?.data,
+      status: response?.data?.code,
+      data: response?.data?.result,
       message: response?.data?.message,
     };
   } catch (e) {

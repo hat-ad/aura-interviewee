@@ -3,11 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import useWebSocket from "@/hooks/useWebsocket";
 import { cn } from "@/lib/utils";
+import {
+  continueInterviewService,
+  endInterviewService,
+  initInterviewService,
+} from "@/services/interviewer";
 import type { InterviewConfig } from "@/types/common";
 import { Brain, MessageCircle, Mic, Settings, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-
 interface InterviewInterfaceProps {
   config: InterviewConfig;
   onBack: () => void;
@@ -28,39 +33,45 @@ export const InterviewInterface = ({
   const [currentTranscription, setCurrentTranscription] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+
   const transcriptionRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
-  const { isConnected, lastMessage, error, sendMessage, closeConnection } =
+  const { isConnected, lastMessage, sendMessage, closeConnection } =
     useWebSocket("ws://localhost:8080", { reconnect: true });
 
   useEffect(() => {
     if (lastMessage) {
-      console.log("📨 Server response:", lastMessage);
+      switch (lastMessage.event) {
+        case "transcription:stream:recognized":
+          setCurrentTranscription(
+            (prev) => prev + lastMessage.payload.data.text
+          );
+          break;
+        case "transcription:stream:closed":
+          askQuestion(currentTranscription);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              type: "user",
+              content: currentTranscription,
+              timestamp: new Date(),
+            },
+          ]);
+          setCurrentTranscription("");
+          break;
+      }
     }
   }, [lastMessage]);
 
   // Simulate initial interviewer greeting
   useEffect(() => {
-    const initialMessage: Message = {
-      id: "1",
-      type: "interviewer",
-      content: `Hello! I'm your AI interviewer. Today we'll be focusing on ${
-        config.mode === "skill"
-          ? `${config.selectedSkill} questions`
-          : "questions based on the job description you provided"
-      } at a ${
-        config.seniorityLevel
-      } level. When you're ready, click the microphone to start recording your response to my first question: "Tell me about yourself and your experience with ${
-        config.mode === "skill"
-          ? config.selectedSkill
-          : "the technologies mentioned in the job description"
-      }."`,
-      timestamp: new Date(),
-    };
-    setMessages([initialMessage]);
+    initInterview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
   // Auto-scroll to latest message
@@ -93,14 +104,14 @@ export const InterviewInterface = ({
       });
 
       processor.onaudioprocess = (e) => {
-        const input = e.inputBuffer.getChannelData(0); // mono channel
-        const pcmBuffer = new ArrayBuffer(input.length * 2); // 16-bit PCM = 2 bytes per sample
+        const input = e.inputBuffer.getChannelData(0);
+        const pcmBuffer = new ArrayBuffer(input.length * 2);
         const view = new DataView(pcmBuffer);
 
         for (let i = 0; i < input.length; i++) {
           let sample = input[i];
-          sample = Math.max(-1, Math.min(1, sample)); // clamp
-          view.setInt16(i * 2, sample * 0x7fff, true); // little-endian
+          sample = Math.max(-1, Math.min(1, sample));
+          view.setInt16(i * 2, sample * 0x7fff, true);
         }
 
         const uint8 = new Uint8Array(pcmBuffer);
@@ -144,6 +155,64 @@ export const InterviewInterface = ({
       subevent: "transcription:stream:close",
       payload: {},
     });
+  };
+
+  const initInterview = async () => {
+    setIsProcessing(true);
+    const response = await initInterviewService(
+      config.mode,
+      config.seniorityLevel,
+      config.selectedSkill,
+      config.jobDescription
+    );
+    if (typeof response === "string") {
+      toast.error(response);
+    } else {
+      setSessionId(response.sessionID);
+      const initialMessage: Message = {
+        id: Date.now().toString(),
+        type: "interviewer",
+        content: response.response,
+        timestamp: new Date(),
+      };
+      setMessages([initialMessage]);
+    }
+    setIsProcessing(false);
+  };
+  const askQuestion = async (userResponse: string) => {
+    setIsProcessing(true);
+    const response = await continueInterviewService(userResponse, sessionId);
+    if (typeof response === "string") {
+      toast.error(response);
+    } else {
+      setSessionId(response.sessionID);
+      const message: Message = {
+        id: Date.now().toString(),
+        type: "interviewer",
+        content: response.response,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, message]);
+    }
+    setIsProcessing(false);
+  };
+
+  const endInterview = async () => {
+    setIsProcessing(true);
+    const response = await endInterviewService(sessionId);
+    if (typeof response === "string") {
+      toast.error(response);
+    } else {
+      setSessionId(response.sessionID);
+      const message: Message = {
+        id: Date.now().toString(),
+        type: "interviewer",
+        content: response.response,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, message]);
+    }
+    setIsProcessing(false);
   };
 
   return (
@@ -215,11 +284,13 @@ export const InterviewInterface = ({
                         {message.type === "interviewer" && (
                           <Brain className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         )}
-                        <div className="space-y-1">
-                          <p className="leading-relaxed">{message.content}</p>
+                        <div className="space-y-1 text-left">
+                          <p className="leading-relaxed text-left">
+                            <ReactMarkdown>{message.content}</ReactMarkdown>
+                          </p>
                           <p
                             className={cn(
-                              "text-xs opacity-70",
+                              "text-xs opacity-70 text-left",
                               message.type === "user"
                                 ? "text-primary-foreground/70"
                                 : "text-muted-foreground"
@@ -269,7 +340,7 @@ export const InterviewInterface = ({
                           ></div>
                         </div>
                         <span className="text-muted-foreground">
-                          AI is thinking...
+                          Aura AI is thinking...
                         </span>
                       </div>
                     </div>
@@ -312,6 +383,13 @@ export const InterviewInterface = ({
                   </p>
                 </div>
               </div>
+              <Button
+                variant={"destructive"}
+                onClick={endInterview}
+                className="mt-4"
+              >
+                End Interview
+              </Button>
             </Card>
 
             {/* Interview Status */}
@@ -330,10 +408,6 @@ export const InterviewInterface = ({
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Level:</span>
                     <span className="capitalize">{config.seniorityLevel}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Questions:</span>
-                    <span>{Math.floor(messages.length / 2)}</span>
                   </div>
                 </div>
               </div>

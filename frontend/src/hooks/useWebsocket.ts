@@ -17,9 +17,10 @@ const useWebSocket = (
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isConnected, setIsConnected] = useState(false);
-  const [lastMessage, setLastMessage] = useState<WebSocketResponse | null>(
-    null
-  );
+  const [lastMessage, setLastMessage] = useState<WebSocketResponse<{
+    event: string;
+    payload: Record<string, unknown>;
+  }> | null>(null);
   const [error, setError] = useState<Event | null>(null);
 
   const connect = useCallback(() => {
@@ -40,7 +41,12 @@ const useWebSocket = (
         if (decoded.payload.status === "error") {
           throw new Error(decoded.payload.message);
         }
-        setLastMessage(decoded as WebSocketResponse);
+        setLastMessage(
+          decoded as WebSocketResponse<{
+            event: string;
+            payload: Record<string, unknown>;
+          }>
+        );
       } catch (err) {
         console.error("[WebSocket] Message decode error:", err);
         setError(new Event("DecodeError"));

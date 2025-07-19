@@ -47,8 +47,16 @@ class InterviewService {
       logger.error("No response received from OpenAI for interview setup");
       return undefined;
     }
-
-    this.cache.put(cacheKey, openAIResponse);
+    interviewSetupPrompt.push({
+      role: "assistant",
+      content: [
+        {
+          type: "text",
+          text: openAIResponse,
+        },
+      ],
+    });
+    this.cache.put(cacheKey, interviewSetupPrompt);
 
     return {
       sessionID: cacheKey,
@@ -60,6 +68,10 @@ class InterviewService {
     const cacheKey = data.sessionID;
 
     const cachedResponse = this.cache.get(cacheKey);
+    logger.error(
+      "🚀 ~ InterviewService ~ continueInterview ~ cachedResponse:",
+      cachedResponse
+    );
 
     if (!cachedResponse) {
       logger.error("No cached response found for interview");
@@ -83,7 +95,15 @@ class InterviewService {
       return undefined;
     }
 
-    cachedResponse.push(openAIResponse);
+    cachedResponse.push({
+      role: "assistant",
+      content: [
+        {
+          type: "text",
+          text: openAIResponse,
+        },
+      ],
+    });
     this.cache.put(cacheKey, cachedResponse);
 
     return Promise.resolve({
@@ -118,7 +138,15 @@ class InterviewService {
       return undefined;
     }
 
-    cachedResponse.push(openAIResponse);
+    cachedResponse.push({
+      role: "assistant",
+      content: [
+        {
+          type: "text",
+          text: openAIResponse,
+        },
+      ],
+    });
     this.cache.put(cacheKey, cachedResponse);
 
     return Promise.resolve({
