@@ -1,0 +1,19 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - 8000:8000
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:5173
+
+  transcriber:
+    build: ./transcriber
+    ports:
+      - 8080:8080
+    env_file:
+      - ./transcriber/.env

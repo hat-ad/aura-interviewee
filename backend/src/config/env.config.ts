@@ -2,7 +2,9 @@ import dotenv from "dotenv";
 import { z } from "zod";
 import openAIEndpoints from "./openai-endpoints.json";
 
-dotenv.config();
+if (process.env.NODE_ENV === "development") {
+  dotenv.config();
+}
 
 const configSchema = z.object({
   PORT: z.string().regex(/^\d+$/).transform(Number),

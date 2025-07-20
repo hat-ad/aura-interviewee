@@ -48,7 +48,7 @@ export const InterviewInterface = ({
       switch (lastMessage.event) {
         case "transcription:stream:recognized":
           setCurrentTranscription(
-            (prev) => prev + lastMessage.payload.data.text
+            (prev) => prev + (lastMessage.payload.data as { text: string }).text
           );
           break;
         case "transcription:stream:closed":

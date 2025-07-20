@@ -18,6 +18,7 @@ const SKILLS = [
   { id: "javascript", name: "JavaScript", icon: Code },
   { id: "typescript", name: "TypeScript", icon: Code },
   { id: "aws", name: "AWS Cloud", icon: Briefcase },
+  { id: "pharmacology", name: "Pharmacology", icon: Briefcase },
 ];
 
 const SENIORITY_LEVELS = [

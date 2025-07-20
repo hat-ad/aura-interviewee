@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "start": "npm run build && node -r module-alias/register dist/server.js",
+    "start:build": "npm run build && node -r module-alias/register dist/server.js",
+    "start": "node -r module-alias/register dist/server.js",
     "dev": "tsx watch --inspect src/server.ts"
   },
   "_moduleAliases": {

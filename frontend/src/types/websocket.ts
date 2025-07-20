@@ -18,7 +18,7 @@ export interface UseWebSocketOptions {
 
 export interface UseWebSocketReturn<T = unknown> {
   isConnected: boolean;
-  lastMessage: WebSocketResponse<T> | null;
+  lastMessage: T | null;
   error: Event | null;
   sendMessage: (msg: MessagePackEvent) => void;
   closeConnection: () => void;
