@@ -2,7 +2,16 @@
 
 Aura Interviewer is a full-stack application designed to help you practice technical interviews on demand, powered by real-time voice transcription and adaptive AI questioning. Inspired by the need for accessible, personalized mock interviews, this project combines my skills in TypeScript, React, Node.js, Express, and cloud-based speech recognition.
 
+## Demo
+
+![AI Interview Coach Demo](./assets/home.jpeg)
+![AI Interview Coach Demo](./assets/setup.jpeg)
+![AI Interview Coach Demo](./assets/interview.jpeg)
+
 ## Features
+
+![Voice Powered](./assets/feature-voice.png)
+![Adaptive AI](./assets/feature-adaptive.png)
 
 - **Voice-Powered Interviews:** Speak naturally and get instant transcription.
 - **Adaptive AI:** Questions adjust to your seniority level and responses.
@@ -35,3 +44,11 @@ I built this project to make mock interviews accessible and effective for anyone
    ```
 3. **Access the app:**
    - Frontend: `http://localhost:3000`
+
+## Future Plans
+
+- **Enable AI Speech Responses:** Integrate a feature where the interviewer can respond with synthesized speech, making the interview experience even more interactive and realistic.
+- **CV/Resume Integration:** Allow users to upload their CV or resume, enabling the system to generate more personalized and relevant interview questions based on their background.
+- **Enhanced Evaluation Quality:** Continuously improve the feedback and evaluation system to provide deeper insights and more actionable recommendations for candidates.
+
+---
