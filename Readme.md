@@ -10,9 +10,6 @@ Aura Interviewer is a full-stack application designed to help you practice techn
 
 ## Features
 
-![Voice Powered](./assets/feature-voice.png)
-![Adaptive AI](./assets/feature-adaptive.png)
-
 - **Voice-Powered Interviews:** Speak naturally and get instant transcription.
 - **Adaptive AI:** Questions adjust to your seniority level and responses.
 - **Skill & JD Modes:** Practice by skill (React, Node.js, AWS, etc.) or paste a job description.
